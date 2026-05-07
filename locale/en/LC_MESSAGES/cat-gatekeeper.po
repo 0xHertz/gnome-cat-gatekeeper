@@ -1,0 +1,40 @@
+# English translations for Cat Gatekeeper extension.
+msgid ""
+msgstr ""
+"Project-Id-Version: cat-gatekeeper\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"PO-Revision-Date: 2024-01-01 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Cat Gatekeeper"
+msgstr "Cat Gatekeeper"
+
+msgid "Shows a cat break screen after you spend too long on selected websites"
+msgstr "Shows a cat break screen after you spend too long on selected websites"
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid "Show Indicator"
+msgstr "Show Indicator"
+
+msgid "Dismiss Cat"
+msgstr "Dismiss Cat"
+
+msgid "Settings"
+msgstr "Settings"
+
+msgid "Usage limit (minutes)"
+msgstr "Usage limit (minutes)"
+
+msgid "Break time (minutes)"
+msgstr "Break time (minutes)"
+
+msgid "Tracked domains"
+msgstr "Tracked domains"

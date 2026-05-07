@@ -1,0 +1,16 @@
+{
+  "uuid": "cat-gatekeeper@cat-gatekeeper.github.com",
+  "name": "Cat Gatekeeper",
+  "description": "Shows a cat break screen after you spend too long on selected websites and applications",
+  "version": "1.0.0",
+  "shell-version": ["46", "47", "48"],
+  "settings-schema": "org.github.cat-gatekeeper",
+  "url": "https://github.com/cat-gatekeeper/cat-gatekeeper-gnome",
+  "license": "MIT",
+  "author": "Cat Gatekeeper Team",
+  "original-authors": [
+    "Nagomi Designer"
+  ],
+  "supports-dark-mode": true,
+  "stylesheet": ["stylesheet.css"]
+}

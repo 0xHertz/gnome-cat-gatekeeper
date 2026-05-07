@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.github.cat-gatekeeper" path="/org/github/cat-gatekeeper/">
+    <key name="usage-limit" type="i">
+      <default>60</default>
+      <summary>Usage limit in minutes</summary>
+      <description>Time in minutes before showing the cat break screen</description>
+    </key>
+    <key name="break-time" type="i">
+      <default>5</default>
+      <summary>Break time in minutes</summary>
+      <description>Duration of the cat break screen in minutes</description>
+    </key>
+    <key name="custom-domains" type="as">
+      <default>['x.com', 'youtube.com', 'facebook.com', 'reddit.com', 'threads.net', 'bsky.app']</default>
+      <summary>List of tracked domains</summary>
+      <description>Domains and applications to track usage time</description>
+    </key>
+    <key name="enabled" type="b">
+      <default>true</default>
+      <summary>Extension enabled</summary>
+      <description>Whether the extension is enabled</description>
+    </key>
+    <key name="show-indicator" type="b">
+      <default>true</default>
+      <summary>Show status indicator</summary>
+      <description>Show indicator in the top panel</description>
+    </key>
+  </schema>
+</schemalist>

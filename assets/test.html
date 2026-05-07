@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Transparent WebM Frame Extractor</title>
+
+        <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+        <style>
+            body {
+                font-family: sans-serif;
+                padding: 20px;
+            }
+
+            button {
+                padding: 10px 12px;
+                font-size: 16px;
+                cursor: pointer;
+            }
+
+            #status {
+                margin-top: 16px;
+                white-space: pre-wrap;
+                font-family: monospace;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h2>透明 WebM 逐帧导出 PNG</h2>
+
+        <p>
+            将 html 与 webm 放在同一目录。<br />
+            推荐 Chrome / Edge。
+        </p>
+
+        <button id="start">开始导出</button>
+
+        <div id="status"></div>
+
+        <video
+            id="video"
+            src="neko2.webm"
+            muted
+            playsinline
+            preload="auto"
+            crossorigin="anonymous"
+            style="display: none"
+        ></video>
+
+        <script>
+            const video = document.getElementById("video");
+            const statusEl = document.getElementById("status");
+            const startBtn = document.getElementById("start");
+
+            let running = false;
+
+            function log(text) {
+                statusEl.textContent = text;
+            }
+
+            function waitEvent(target, eventName) {
+                return new Promise((resolve) => {
+                    target.addEventListener(eventName, resolve, { once: true });
+                });
+            }
+
+            async function finish(zip, frameCount) {
+                log(
+                    `正在生成 ZIP...
+
+总帧数: ${frameCount}`,
+                );
+
+                const blob = await zip.generateAsync({
+                    type: "blob",
+                    compression: "DEFLATE",
+                    compressionOptions: {
+                        level: 1,
+                    },
+                });
+
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement("a");
+
+                a.href = url;
+                a.download = "frames.zip";
+
+                document.body.appendChild(a);
+
+                a.click();
+
+                a.remove();
+
+                setTimeout(() => {
+                    URL.revokeObjectURL(url);
+                }, 10000);
+
+                log(
+                    `完成
+
+总帧数: ${frameCount}`,
+                );
+
+                running = false;
+
+                startBtn.disabled = false;
+            }
+
+            startBtn.onclick = async () => {
+                if (running) return;
+
+                running = true;
+
+                startBtn.disabled = true;
+
+                log("加载视频中...");
+
+                const zip = new JSZip();
+
+                try {
+                    video.pause();
+
+                    video.currentTime = 0;
+
+                    video.load();
+
+                    await waitEvent(video, "loadedmetadata");
+
+                    const width = video.videoWidth;
+                    const height = video.videoHeight;
+
+                    log(
+                        `视频已加载
+
+分辨率: ${width}x${height}
+时长: ${video.duration.toFixed(3)} 秒`,
+                    );
+
+                    const canvas = document.createElement("canvas");
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx = canvas.getContext("2d", { alpha: true });
+
+                    let frameIndex = 0;
+
+                    async function saveFrame(mediaTime) {
+                        ctx.clearRect(0, 0, width, height);
+
+                        // 浏览器正确处理 VP9 alpha
+                        ctx.drawImage(video, 0, 0);
+
+                        const blob = await new Promise((resolve) => {
+                            canvas.toBlob(resolve, "image/png");
+                        });
+
+                        const filename = `f_${String(frameIndex).padStart(
+                            5,
+                            "0",
+                        )}.png`;
+
+                        zip.file(filename, blob);
+
+                        frameIndex++;
+
+                        log(
+                            `导出中...
+
+帧: ${frameIndex}
+时间: ${mediaTime.toFixed(3)}s / ${video.duration.toFixed(3)}s`,
+                        );
+                    }
+
+                    function nextFrame() {
+                        return new Promise((resolve, reject) => {
+                            let finished = false;
+
+                            // 最后一帧经常不会 callback
+                            // 所以加超时强制结束
+
+                            const timeout = setTimeout(() => {
+                                if (finished) return;
+
+                                finished = true;
+
+                                if (
+                                    video.currentTime >=
+                                    video.duration - 0.05
+                                ) {
+                                    resolve(false);
+                                } else {
+                                    reject(new Error("Video frame timeout"));
+                                }
+                            }, 1000);
+
+                            video.requestVideoFrameCallback(
+                                async (now, metadata) => {
+                                    if (finished) return;
+
+                                    finished = true;
+
+                                    clearTimeout(timeout);
+
+                                    try {
+                                        await saveFrame(metadata.mediaTime);
+
+                                        // 接近结尾时停止
+
+                                        if (
+                                            metadata.mediaTime >=
+                                            video.duration - 0.05
+                                        ) {
+                                            resolve(false);
+                                        } else {
+                                            resolve(true);
+                                        }
+                                    } catch (err) {
+                                        reject(err);
+                                    }
+                                },
+                            );
+                        });
+                    }
+
+                    await video.play();
+
+                    while (video.currentTime < video.duration - 0.05) {
+                        const ok = await nextFrame();
+
+                        if (!ok) break;
+                    }
+
+                    video.pause();
+
+                    await finish(zip, frameIndex);
+                } catch (err) {
+                    console.error(err);
+
+                    log(
+                        `发生错误:
+
+${err}`,
+                    );
+
+                    running = false;
+
+                    startBtn.disabled = false;
+                }
+            };
+        </script>
+    </body>
+</html>
