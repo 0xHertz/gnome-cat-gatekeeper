@@ -1,8 +1,7 @@
 .cat-countdown {
-  font-size: 48px;
-  font-weight: bold;
-  color: #ffffff;
-  background-color: rgba(0, 0, 0, 0.45);
-  border-radius: 12px;
-  padding: 6px 24px;
+    font-size: 32px;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.5);
+    padding: 12px 24px;
+    border-radius: 16px;
 }
