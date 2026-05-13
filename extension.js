@@ -1,3 +1,4 @@
+import Clutter from "gi://Clutter";
 import GLib from "gi://GLib";
 import Gio from "gi://Gio";
 import St from "gi://St";
@@ -343,6 +344,23 @@ function showCat(breakMinutes, onBreakEnd) {
     can_focus: true,
   });
 
+  const margin = 200;
+  const labelWidth = Math.floor(monitor.width * 0.4);
+  const labelHeight = Math.floor(monitor.height * 0.4);
+  const fontSize = Math.floor(Math.min(labelWidth, labelHeight) * 0.7);
+
+  const countdownLabel = new St.Label({
+    text: formatTime(breakMinutes * 60),
+    style_class: "cat-countdown",
+  });
+
+  countdownLabel.set_position(margin + 100, margin);
+  countdownLabel.set_size(labelWidth, labelHeight);
+  countdownLabel.set_style(`font-size: ${fontSize}px;`);
+  countdownLabel.get_first_child().set_y_align(Clutter.ActorAlign.CENTER);
+
+  catOverlay.add_child(countdownLabel);
+
   catActor = new St.Widget({
     x: 0,
     y: 0,
@@ -351,15 +369,6 @@ function showCat(breakMinutes, onBreakEnd) {
   });
 
   catOverlay.add_child(catActor);
-
-  const countdownLabel = new St.Label({
-    text: formatTime(breakMinutes * 60),
-    style_class: "cat-countdown",
-  });
-
-  countdownLabel.set_position(Math.floor((monitor.width - 200) / 2), 24);
-
-  catOverlay.add_child(countdownLabel);
 
   Main.layoutManager.addChrome(catOverlay, {
     affectsInputRegion: true,
